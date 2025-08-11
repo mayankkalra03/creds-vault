@@ -446,7 +446,7 @@ function App() {
     };
 
     const renderSearchResults = () => (
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto">
             <h2 className="text-xl font-bold text-white mb-4">Search Results for "{searchTerm}"</h2>
             {filteredData.length > 0 ? (
                 <div className="space-y-4">
@@ -582,7 +582,7 @@ function App() {
                                                             <button onClick={() => setModal({ type: 'role', data: role })} className="text-xs text-slate-400 hover:text-sky-400 transition-colors"><EditIcon /></button>
                                                             <button onClick={() => setConfirmDelete({ type: 'role', item: role })} className="text-xs text-red-500 hover:text-red-400 transition-colors"><TrashIcon /></button>
                                                         </div>
-                                                        <button onClick={() => setModal({ type: 'cred', data: null, parentId: role.id })} className="flex-shrink-0 flex items-center px-3 py-1 text-xs font-medium text-white bg-sky-600 rounded-md hover:bg-sky-500 transition-colors"><PlusIcon /> <span className="ml-1">Add Account</span></button>
+                                                        <button onClick={() => setModal({ type: 'cred', data: null, parentId: role.id })} className="ml-2 flex-shrink-0 flex items-center px-3 py-1 text-xs font-medium text-white bg-sky-600 rounded-md hover:bg-sky-500 transition-colors"><PlusIcon /> <span className="ml-1">Add Account</span></button>
                                                     </div>
                                                     <div className="space-y-3 flex-1">
                                                         {(credentials[role.id] || []).length > 0 ? (credentials[role.id] || []).map(cred => (

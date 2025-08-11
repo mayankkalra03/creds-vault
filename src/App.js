@@ -32,27 +32,6 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
 };
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'credential-vault-app';
 
-// --- Global Styles Component for modern scrollbars ---
-const GlobalStyles = () => (
-    <style>{`
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #1e293b; /* slate-800 */
-      }
-      ::-webkit-scrollbar-thumb {
-        background-color: #475569; /* slate-600 */
-        border-radius: 4px;
-        border: 2px solid #1e293b; /* slate-800 */
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background-color: #64748b; /* slate-500 */
-      }
-    `}</style>
-);
-
 
 // --- SVG Icons ---
 const ProjectIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-3 text-slate-400"><path d="M20 12.5L14.5 18L9.5 13L4 18" /><path d="M20 6L14.5 11.5L9.5 6.5L4 11.5" /></svg>);
@@ -151,16 +130,6 @@ function App() {
     const [confirmDelete, setConfirmDelete] = React.useState(null);
     const [isModalPasswordVisible, setIsModalPasswordVisible] = React.useState(false);
 
-    // --- Add Tailwind CSS script to ensure styling is applied ---
-    React.useEffect(() => {
-        const scriptId = 'tailwind-script';
-        if (document.getElementById(scriptId)) return;
-        const script = document.createElement('script');
-        script.id = scriptId;
-        script.src = 'https://cdn.tailwindcss.com';
-        document.head.appendChild(script);
-    }, []);
-
     // --- Firebase Initialization and Auth ---
     React.useEffect(() => {
         const app = initializeApp(firebaseConfig);
@@ -200,17 +169,12 @@ function App() {
             projectsData.sort((a, b) => a.name.localeCompare(b.name));
             setProjects(projectsData);
     
-            if (activeProject) {
-                const updated = projectsData.find(p => p.id === activeProject.id);
-                if (updated) {
-                    setActiveProject(updated);
-                }
-            } else if (projectsData.length > 0) {
+            if (projectsData.length > 0 && (!activeProject || !projectsData.find(p => p.id === activeProject.id))) {
                 setActiveProject(projectsData[0]);
-            } else {
+            } else if (projectsData.length === 0) {
                 setActiveProject(null);
             }
-
+    
             let aggregatedData = [];
             for (const project of projectsData) {
                 aggregatedData.push({ ...project, type: 'Project' });
@@ -503,7 +467,6 @@ function App() {
 
     return (
         <div className="h-screen w-screen bg-slate-900 text-slate-200 flex font-sans overflow-hidden">
-            <GlobalStyles />
             {renderModal()}
             {renderConfirmDeleteModal()}
             

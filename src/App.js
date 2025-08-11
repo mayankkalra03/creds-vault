@@ -197,14 +197,20 @@ function App() {
         const projectsPath = `artifacts/${appId}/users/${user.uid}/projects`;
         const unsubscribe = onSnapshot(query(collection(db, projectsPath)), async (projectsSnapshot) => {
             const projectsData = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            projectsData.sort((a, b) => a.name.localeCompare(b.name));
             setProjects(projectsData);
     
-            if (projectsData.length > 0 && (!activeProject || !projectsData.find(p => p.id === activeProject.id))) {
+            if (activeProject) {
+                const updated = projectsData.find(p => p.id === activeProject.id);
+                if (updated) {
+                    setActiveProject(updated);
+                }
+            } else if (projectsData.length > 0) {
                 setActiveProject(projectsData[0]);
-            } else if (projectsData.length === 0) {
+            } else {
                 setActiveProject(null);
             }
-    
+
             let aggregatedData = [];
             for (const project of projectsData) {
                 aggregatedData.push({ ...project, type: 'Project' });
@@ -260,6 +266,7 @@ function App() {
         const q = query(collection(db, path));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            data.sort((a, b) => a.name.localeCompare(b.name)); 
             setRoles(prev => ({ ...prev, [activeEnv.id]: data }));
         });
         return unsubscribe;
@@ -573,7 +580,7 @@ function App() {
                                             </div>
                                             <button onClick={() => setModal({ type: 'role', data: null })} className="flex-shrink-0 flex items-center px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-500 transition-colors"><PlusIcon /> <span className="ml-2">Add Role</span></button>
                                         </div>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        <div className="space-y-6">
                                             {(roles[activeEnv.id] || []).map(role => (
                                                 <div key={role.id} className="bg-slate-800 rounded-lg shadow-lg shadow-slate-950/20 p-4 border border-slate-700 flex flex-col">
                                                     <div className="flex justify-between items-center mb-3">
@@ -584,9 +591,9 @@ function App() {
                                                         </div>
                                                         <button onClick={() => setModal({ type: 'cred', data: null, parentId: role.id })} className="ml-2 flex-shrink-0 flex items-center px-3 py-1 text-xs font-medium text-white bg-sky-600 rounded-md hover:bg-sky-500 transition-colors"><PlusIcon /> <span className="ml-1">Add Account</span></button>
                                                     </div>
-                                                    <div className="space-y-3 flex-1">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 flex-1">
                                                         {(credentials[role.id] || []).length > 0 ? (credentials[role.id] || []).map(cred => (
-                                                            <div key={cred.id} className="bg-slate-700/50 rounded-md p-3 space-y-2">
+                                                            <div key={cred.id} className="bg-slate-700/50 rounded-md p-3 space-y-2 flex flex-col">
                                                                 <div className="flex items-center">
                                                                     <div className="flex-1 flex items-center bg-slate-800 rounded-md px-3 py-1 border border-slate-700">
                                                                         <span className="font-mono text-sm font-semibold flex-1 truncate text-white">{cred.username}</span>
